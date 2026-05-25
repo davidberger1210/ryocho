@@ -1125,9 +1125,12 @@ async function syncSheet(rec) {
     await fetch(SHEET, {
       method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        month: rec.month || '', date: rec.date, tripName: rec.tripName || settings.tripName,
-        storeName: rec.storeName, category: rec.category, payMethod: rec.payMethod,
-        payer: rec.payer || '', total: rec.total, totalTWD: twd(rec.total),
+        date: rec.date,
+        storeName: rec.storeName,
+        category: rec.category,
+        payMethod: rec.payMethod,
+        total: rec.total,
+        totalTWD: twd(rec.total),
         items: rec.items.map(i => `${i.name} ¥${i.price}`).join('、')
       })
     });
