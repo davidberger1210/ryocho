@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#FF6B00">
+<meta name="theme-color" content="#1B9431">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="旅帳">
@@ -20,7 +20,7 @@
     --bg:#F2F2F7; --card:#FFFFFF; --ink:#000000;
     --label:rgba(0,0,0,0.85); --secondary:rgba(60,60,67,0.6);
     --tertiary:rgba(60,60,67,0.3); --sep:rgba(60,60,67,0.12);
-    --blue:#007AFF; --orange:#FF6B00; --green:#34C759;
+    --blue:#007AFF; --brand:#1B9431; --green:#34C759;
     --red:#FF3B30; --fill:rgba(120,120,128,0.12);
   }
   [data-theme="dark"] {
@@ -54,12 +54,12 @@
   .tab.on { color:var(--blue); }
   .tab svg { width:25px; height:25px; }
   .tab span { font-size:10px; font-weight:500; }
-  .tab-cam { width:56px; height:56px; background:var(--orange); border-radius:16px; display:flex; align-items:center; justify-content:center; border:none; cursor:pointer; transform:translateY(-16px); box-shadow:0 4px 24px rgba(255,107,0,0.4); transition:all 0.15s; }
+  .tab-cam { width:56px; height:56px; background:var(--brand); border-radius:16px; display:flex; align-items:center; justify-content:center; border:none; cursor:pointer; transform:translateY(-16px); box-shadow:0 4px 24px rgba(27,148,49,0.4); transition:all 0.15s; }
   .tab-cam:active { transform:translateY(-14px) scale(0.95); }
   .tab-cam svg { width:26px; height:26px; color:white; }
 
   /* HOME HERO */
-  .hero { margin:0 16px 16px; background:var(--orange); border-radius:22px; padding:20px; color:white; position:relative; overflow:hidden; }
+  .hero { margin:0 16px 16px; background:var(--brand); border-radius:22px; padding:20px; color:white; position:relative; overflow:hidden; }
   .hero-label { font-size:13px; opacity:0.8; font-weight:500; margin-bottom:2px; }
   .hero-trip { font-size:22px; font-weight:700; letter-spacing:-0.3px; margin-bottom:20px; }
   .hero-day { position:absolute; top:20px; right:20px; background:rgba(255,255,255,0.22); border-radius:20px; padding:4px 12px; font-size:13px; font-weight:700; }
@@ -73,7 +73,7 @@
   .month-chips { display:flex; gap:8px; padding:0 16px 12px; overflow-x:auto; -webkit-overflow-scrolling:touch; }
   .month-chips::-webkit-scrollbar { display:none; }
   .mchip { flex-shrink:0; padding:6px 14px; border-radius:18px; border:1.5px solid var(--sep); background:var(--card); font-size:13px; font-weight:500; cursor:pointer; color:var(--label); font-family:'Noto Sans TC',sans-serif; white-space:nowrap; }
-  .mchip.on { border-color:var(--orange); background:rgba(255,107,0,0.1); color:var(--orange); font-weight:600; }
+  .mchip.on { border-color:var(--brand); background:rgba(27,148,49,0.1); color:var(--brand); font-weight:600; }
 
   /* BUDGET */
   .budget { margin:0 16px 16px; background:var(--card); border-radius:16px; padding:16px; }
@@ -165,7 +165,7 @@
   .chip.on { border-color:var(--blue); background:rgba(0,122,255,0.08); color:var(--blue); }
   .chip.on-g { border-color:var(--green); background:rgba(52,199,89,0.08); color:var(--green); }
 
-  .cfm-btn { width:100%; padding:17px; background:var(--orange); color:white; border:none; border-radius:16px; font-size:17px; font-weight:700; cursor:pointer; margin-bottom:6px; font-family:'Noto Sans TC',sans-serif; box-shadow:0 4px 16px rgba(255,107,0,0.3); transition:all 0.15s; }
+  .cfm-btn { width:100%; padding:17px; background:var(--brand); color:white; border:none; border-radius:16px; font-size:17px; font-weight:700; cursor:pointer; margin-bottom:6px; font-family:'Noto Sans TC',sans-serif; box-shadow:0 4px 16px rgba(27,148,49,0.3); transition:all 0.15s; }
   .cfm-btn:active { transform:scale(0.98); }
   .cfm-sub { text-align:center; font-size:12px; color:var(--secondary); margin-bottom:16px; }
 
@@ -175,7 +175,7 @@
   .barchart { display:flex; align-items:flex-end; gap:6px; height:90px; }
   .barcol { flex:1; display:flex; flex-direction:column; align-items:center; gap:4px; }
   .bar { width:100%; border-radius:6px 6px 0 0; background:var(--fill); min-height:4px; }
-  .bar.hi { background:var(--orange); }
+  .bar.hi { background:var(--brand); }
   .bar-lbl { font-size:9px; color:var(--secondary); }
   .bar-val { font-size:8px; color:var(--secondary); font-weight:500; }
   .catlist { display:flex; flex-direction:column; gap:10px; }
@@ -201,7 +201,7 @@
   .set-row:last-child { border-bottom:none; }
   .set-l { display:flex; align-items:center; gap:12px; }
   .set-ic { width:30px; height:30px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:15px; flex-shrink:0; }
-  .ic-b { background:rgba(0,122,255,0.12); } .ic-o { background:rgba(255,107,0,0.12); }
+  .ic-b { background:rgba(0,122,255,0.12); } .ic-o { background:rgba(27,148,49,0.12); }
   .ic-g { background:rgba(52,199,89,0.12); } .ic-r { background:rgba(255,59,48,0.12); }
   .ic-p { background:rgba(175,82,222,0.12); }
   .set-nm { font-size:16px; white-space:nowrap; }
@@ -345,12 +345,7 @@
       </div>
       <div class="opt-card">
         <div class="opt-lbl">付款方式</div>
-        <div class="chips">
-          <button class="chip on-g on" data-pay="現金" onclick="selPay(this)">現金</button>
-          <button class="chip" data-pay="Suica" onclick="selPay(this)">Suica</button>
-          <button class="chip" data-pay="PayPay" onclick="selPay(this)">PayPay</button>
-          <button class="chip" data-pay="信用卡" onclick="selPay(this)">信用卡</button>
-        </div>
+        <div class="chips" id="paymethod-chips"></div>
       </div>
       <div class="opt-card">
         <div class="opt-lbl">由誰付款</div>
@@ -414,6 +409,10 @@
     <div class="set-grp">
       <div class="set-grp-t">月份與行程 <span style="color:var(--blue);font-weight:400;">點一下切換為當前月份</span></div>
       <div class="set-list" id="months-list"></div>
+    </div>
+    <div class="set-grp">
+      <div class="set-grp-t">付款方式</div>
+      <div class="set-list" id="paymethods-list"></div>
     </div>
     <div class="set-grp">
       <div class="set-grp-t">付款人名單</div>
@@ -485,11 +484,13 @@ let records = JSON.parse(localStorage.getItem('jr') || '[]');
 let settings = Object.assign({}, DEFAULT_SETTINGS, JSON.parse(localStorage.getItem('js') || '{}'));
 let appPassword = localStorage.getItem('jak') || '';
 let members = JSON.parse(localStorage.getItem('jm') || '["我","旅伴"]');
-let curCat = '餐飲', curPay = '現金', curPayer = '', curScan = null, vm = 'date';
+const DEFAULT_PAY_METHODS = ['現金', 'Suica', 'PayPay', '國泰CUBE卡', '聯邦吉鶴卡', '玉山Pi卡', '中信LINE Pay卡', '信用卡'];
+let payMethods = JSON.parse(localStorage.getItem('jp') || JSON.stringify(DEFAULT_PAY_METHODS));
+let curCat = '餐飲', curPay = payMethods[0] || '現金', curPayer = '', curScan = null, vm = 'date';
 
 const SHEET = 'https://script.google.com/macros/s/AKfycbzyrSFmkYeKt8MlNU54Jx9Ut_IThJI6DwpSIoRcHIN4ayxpUMBWO7opPofAW_peD-GzIg/exec';
 const CI = { '餐飲':'🍜', '購物':'🛍', '交通':'🚃', '住宿':'🏨', '其他':'📦' };
-const CC = { '餐飲':'#FF6B00', '購物':'#007AFF', '交通':'#34C759', '住宿':'#AF52DE', '其他':'#8E8E93' };
+const CC = { '餐飲':'#1B9431', '購物':'#007AFF', '交通':'#5856D6', '住宿':'#AF52DE', '其他':'#8E8E93' };
 
 // === Helpers ===
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
@@ -536,6 +537,7 @@ function init() {
   document.getElementById('rate-input').value = settings.rate;
   document.getElementById('theme-toggle').checked = settings.theme === 'dark';
   renderMembers();
+  renderPayMethods();
   renderMonths();
   refreshHome();
   refreshRecords();
@@ -547,7 +549,7 @@ function init() {
 
 function applyTheme() {
   document.documentElement.setAttribute('data-theme', settings.theme === 'dark' ? 'dark' : 'light');
-  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', settings.theme === 'dark' ? '#000000' : '#FF6B00');
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', settings.theme === 'dark' ? '#000000' : '#1B9431');
 }
 
 function toggleTheme() {
@@ -787,7 +789,7 @@ function refreshStats() {
   if (settleEl) {
     let msg = '', color = 'var(--secondary)', icon = '🤝';
     if (Math.abs(balance) < 1) { msg = '目前雙方平帳'; color = 'var(--green)'; icon = '✅'; }
-    else if (balance > 0) { msg = `${esc(m1)} 欠 ${esc(m0)}  ¥${fmt(Math.round(balance))}`; color = 'var(--orange)'; icon = '💸'; }
+    else if (balance > 0) { msg = `${esc(m1)} 欠 ${esc(m0)}  ¥${fmt(Math.round(balance))}`; color = 'var(--brand)'; icon = '💸'; }
     else { msg = `${esc(m0)} 欠 ${esc(m1)}  ¥${fmt(Math.round(-balance))}`; color = 'var(--red)'; icon = '💸'; }
     settleEl.innerHTML = `
       <div class="chart-hd">結算</div>
@@ -913,7 +915,7 @@ function renderItems(items) {
       'owe01': m0 + '欠' + m1,
       'owe10': m1 + '欠' + m0
     }[split] || 'AA';
-    const splitColor = { 'aa': 'var(--blue)', 'solo0': 'var(--secondary)', 'solo1': 'var(--secondary)', 'owe01': 'var(--red)', 'owe10': 'var(--orange)' }[split] || 'var(--blue)';
+    const splitColor = { 'aa': 'var(--blue)', 'solo0': 'var(--secondary)', 'solo1': 'var(--secondary)', 'owe01': 'var(--red)', 'owe10': 'var(--brand)' }[split] || 'var(--blue)';
     return `<div class="ritem" id="row-${i}">
       <div class="ritem-num">${i + 1}</div>
       <div class="ritem-info">
@@ -1035,6 +1037,69 @@ function removeMember(i) {
   refreshHome(); refreshRecords(); refreshStats();
 }
 
+// === PAY METHODS ===
+function renderPayMethods() {
+  if (!payMethods.includes(curPay)) curPay = payMethods[0] || '現金';
+  const el = document.getElementById('paymethod-chips');
+  if (el) el.innerHTML = payMethods.map(m =>
+    `<button class="chip${m === curPay ? ' on-g on' : ''}" data-pay="${escAttr(m)}" onclick="selPay(this)">${esc(m)}</button>`
+  ).join('');
+  renderPayMethodSettings();
+}
+
+function renderPayMethodSettings() {
+  const el = document.getElementById('paymethods-list');
+  if (!el) return;
+  el.innerHTML = payMethods.map((m, i) => `
+    <div class="set-row">
+      <div class="set-l"><div class="set-ic ic-g">💳</div>
+        <input value="${escAttr(m)}" style="border:none;outline:none;font-size:16px;background:transparent;font-family:'Noto Sans TC',sans-serif;width:160px;color:var(--ink);" onchange="editPayMethod(${i}, this.value)" placeholder="輸入名稱">
+      </div>
+      <button onclick="removePayMethod(${i})" style="background:none;border:none;color:var(--red);font-size:14px;cursor:pointer;padding:4px 8px;">移除</button>
+    </div>`).join('') + `
+    <div class="set-row" onclick="addPayMethod()" style="cursor:pointer;">
+      <div class="set-l"><div class="set-ic ic-g">＋</div><div class="set-nm" style="color:var(--blue);">新增付款方式</div></div>
+    </div>`;
+}
+
+function editPayMethod(i, val) {
+  if (!val || !val.trim()) return;
+  const oldName = payMethods[i];
+  const newName = val.trim();
+  if (oldName === newName) return;
+  payMethods[i] = newName;
+  let changed = 0;
+  records.forEach(r => {
+    if (r.payMethod === oldName) { r.payMethod = newName; changed++; }
+  });
+  if (curPay === oldName) curPay = newName;
+  localStorage.setItem('jp', JSON.stringify(payMethods));
+  if (changed) {
+    saveRecords();
+    refreshHome(); refreshRecords(); refreshStats();
+    showToast(`已更新 ${changed} 筆記錄的付款方式`);
+  }
+  renderPayMethods();
+}
+
+function addPayMethod() {
+  const name = prompt('輸入付款方式名稱（例：國泰CUBE卡、富邦J卡）：');
+  if (!name || !name.trim()) return;
+  if (payMethods.includes(name.trim())) { showToast('已有同名付款方式'); return; }
+  payMethods.push(name.trim());
+  localStorage.setItem('jp', JSON.stringify(payMethods));
+  renderPayMethods();
+}
+
+function removePayMethod(i) {
+  if (payMethods.length <= 1) { showToast('至少保留一種付款方式'); return; }
+  if (!confirm(`移除「${payMethods[i]}」？已存記錄的付款方式名稱不變。`)) return;
+  if (curPay === payMethods[i]) curPay = payMethods[0] !== payMethods[i] ? payMethods[0] : payMethods[1];
+  payMethods.splice(i, 1);
+  localStorage.setItem('jp', JSON.stringify(payMethods));
+  renderPayMethods();
+}
+
 // === MONTHS ===
 function renderMonths() {
   if (!settings.months) settings.months = [];
@@ -1045,8 +1110,8 @@ function renderMonths() {
     const isActive = m.name === cm.name;
     return `<div class="set-row" onclick="setActiveMonth('${escAttr(m.name)}')" style="cursor:pointer;">
       <div class="set-l">
-        <div class="set-ic ic-o" style="${isActive ? 'background:var(--orange);color:white;' : ''}">${isActive ? '✓' : '🗓'}</div>
-        <div><div class="set-nm">${esc(m.name)}${isActive ? ' <span style="color:var(--orange);font-size:12px;font-weight:600;">當前</span>' : ''}</div><div style="font-size:12px;color:var(--secondary);">${esc(m.tripName)}</div></div>
+        <div class="set-ic ic-o" style="${isActive ? 'background:var(--brand);color:white;' : ''}">${isActive ? '✓' : '🗓'}</div>
+        <div><div class="set-nm">${esc(m.name)}${isActive ? ' <span style="color:var(--brand);font-size:12px;font-weight:600;">當前</span>' : ''}</div><div style="font-size:12px;color:var(--secondary);">${esc(m.tripName)}</div></div>
       </div>
       <button onclick="removeMonth(${i},event)" style="background:none;border:none;color:var(--red);font-size:14px;cursor:pointer;">移除</button>
     </div>`;
@@ -1195,9 +1260,9 @@ function clearAll() {
 // === EXPORT / IMPORT ===
 function exportData() {
   const data = {
-    records, settings, members,
+    records, settings, members, payMethods,
     exportedAt: new Date().toISOString(),
-    version: 2
+    version: 3
   };
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
   triggerDownload(blob, `ryocho-backup-${today()}.json`);
@@ -1247,6 +1312,7 @@ function importData(e) {
       if (Array.isArray(data.records)) { records = data.records; saveRecords(); }
       if (data.settings) { settings = Object.assign({}, DEFAULT_SETTINGS, data.settings); save(); }
       if (Array.isArray(data.members) && data.members.length) { members = data.members; localStorage.setItem('jm', JSON.stringify(members)); }
+      if (Array.isArray(data.payMethods) && data.payMethods.length) { payMethods = data.payMethods; localStorage.setItem('jp', JSON.stringify(payMethods)); }
       init();
       showToast('匯入完成');
     } catch (err) {
