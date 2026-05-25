@@ -1,0 +1,15 @@
+{
+  "name": "旅帳 Ryocho",
+  "short_name": "旅帳",
+  "description": "日本旅行 AI 收據記帳",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F2F2F7",
+  "theme_color": "#FF6B00",
+  "lang": "zh-TW",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
