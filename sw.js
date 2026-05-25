@@ -1,4 +1,4 @@
-const CACHE = 'ryocho-v3';
+const CACHE = 'ryocho-v4';
 const ASSETS = ['./', './index.html', './manifest.json', './icon.svg'];
 
 self.addEventListener('install', e => {
@@ -14,10 +14,26 @@ self.addEventListener('activate', e => {
 
 self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
-  // 不快取 API 與 Google Sheet
   if (url.hostname.includes('anthropic.com') || url.hostname.includes('script.google.com')) return;
   if (url.pathname.startsWith('/api/')) return;
   if (e.request.method !== 'GET') return;
+
+  // index.html 與根路徑：network-first，確保更新可即時生效
+  const isHTML = url.pathname === '/' || url.pathname.endsWith('/index.html') || e.request.mode === 'navigate';
+  if (isHTML) {
+    e.respondWith(
+      fetch(e.request).then(resp => {
+        if (resp && resp.status === 200) {
+          const copy = resp.clone();
+          caches.open(CACHE).then(c => c.put(e.request, copy));
+        }
+        return resp;
+      }).catch(() => caches.match(e.request))
+    );
+    return;
+  }
+
+  // 其他資源：cache-first
   e.respondWith(
     caches.match(e.request).then(cached =>
       cached || fetch(e.request).then(resp => {
