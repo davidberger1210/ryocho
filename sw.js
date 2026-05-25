@@ -1,4 +1,4 @@
-const CACHE = 'ryocho-v2';
+const CACHE = 'ryocho-v3';
 const ASSETS = ['./', './index.html', './manifest.json', './icon.svg'];
 
 self.addEventListener('install', e => {
@@ -16,6 +16,7 @@ self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
   // 不快取 API 與 Google Sheet
   if (url.hostname.includes('anthropic.com') || url.hostname.includes('script.google.com')) return;
+  if (url.pathname.startsWith('/api/')) return;
   if (e.request.method !== 'GET') return;
   e.respondWith(
     caches.match(e.request).then(cached =>

@@ -392,10 +392,11 @@
   <div class="scroll">
     <div class="nav"><div class="nav-title">設定</div></div>
     <div class="api-wrap">
-      <div class="api-lbl">Claude API Key（AI 辨識收據）</div>
-      <input type="password" class="api-inp" id="api-key-input" placeholder="sk-ant-api03-...">
+      <div class="api-lbl">App 密碼（伺服器若有設定才需要填）</div>
+      <input type="password" class="api-inp" id="api-key-input" placeholder="僅當你在 Vercel 設了 APP_PASSWORD 才需要">
       <button class="api-save" onclick="saveApiKey()">儲存</button>
       <div class="api-ok" id="api-key-status">已儲存</div>
+      <div style="font-size:12px;color:var(--secondary);padding:6px 4px 0;">AI 金鑰已搬到 Vercel 後端，前端不再暴露。</div>
     </div>
     <div class="set-grp">
       <div class="set-grp-t">旅程</div>
@@ -442,7 +443,7 @@
         <div class="set-row" onclick="clearAll()"><div class="set-l"><div class="set-ic ic-r">🗑</div><div class="set-nm" style="color:var(--red);">清除所有記錄</div></div><span class="chev">›</span></div>
       </div>
     </div>
-    <div style="text-align:center;font-size:11px;color:var(--secondary);padding:8px 0 16px;">旅帳 v2 · 本地儲存</div>
+    <div style="text-align:center;font-size:11px;color:var(--secondary);padding:8px 0 16px;">旅帳 v3 · Vercel + 本地儲存</div>
   </div>
   <div class="tabbar">
     <button class="tab" onclick="switchTab('home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>首頁</span></button>
@@ -478,7 +479,7 @@ const DEFAULT_SETTINGS = {
 
 let records = JSON.parse(localStorage.getItem('jr') || '[]');
 let settings = Object.assign({}, DEFAULT_SETTINGS, JSON.parse(localStorage.getItem('js') || '{}'));
-let apiKey = localStorage.getItem('jak') || '';
+let appPassword = localStorage.getItem('jak') || '';
 let members = JSON.parse(localStorage.getItem('jm') || '["我","旅伴"]');
 let curCat = '餐飲', curPay = '現金', curPayer = '', curScan = null, vm = 'date';
 
@@ -524,7 +525,7 @@ function init() {
   applyTheme();
   updateClock();
   setInterval(updateClock, 1000);
-  document.getElementById('api-key-input').value = apiKey ? '••••••••••••' : '';
+  document.getElementById('api-key-input').value = appPassword ? '••••••••••••' : '';
   document.getElementById('trip-name-input').value = settings.tripName;
   document.getElementById('budget-input').value = settings.budget;
   document.getElementById('start-date-input').value = settings.startDate;
@@ -811,29 +812,57 @@ function handleFile(e) {
   e.target.value = '';
 }
 
+async function compressImage(dataUrl, maxDim = 1600, quality = 0.85) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      let w = img.width, h = img.height;
+      if (w > maxDim || h > maxDim) {
+        if (w > h) { h = Math.round(h * maxDim / w); w = maxDim; }
+        else { w = Math.round(w * maxDim / h); h = maxDim; }
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      resolve(canvas.toDataURL('image/jpeg', quality));
+    };
+    img.onerror = reject;
+    img.src = dataUrl;
+  });
+}
+
 async function scanIt(dataUrl) {
-  if (!apiKey) { showToast('請先在設定中輸入 API Key'); document.getElementById('scan-load').style.display = 'none'; useMock(); return; }
-  const b64 = dataUrl.split(',')[1], mt = dataUrl.split(';')[0].split(':')[1];
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
+    const compressed = await compressImage(dataUrl).catch(() => dataUrl);
+    const b64 = compressed.split(',')[1];
+    const mt = compressed.split(';')[0].split(':')[1] || 'image/jpeg';
+    const headers = { 'Content-Type': 'application/json' };
+    if (appPassword) headers['x-app-password'] = appPassword;
+
+    const res = await fetch('/api/scan', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1500,
-        messages: [{
-          role: 'user', content: [
-            { type: 'image', source: { type: 'base64', media_type: mt, data: b64 } },
-            { type: 'text', text: `分析此日本收據，只回傳JSON不含其他文字：{"storeName":"店名繁中","storeNameJp":"日文原名","date":"YYYY-MM-DD","total":數字,"items":[{"name":"品名繁中","nameJp":"日文","price":數字,"tax":"8%或10%"}]}` }
-          ]
-        }]
-      })
+      headers,
+      body: JSON.stringify({ image: b64, mediaType: mt })
     });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      const msg = err.error || `HTTP ${res.status}`;
+      showToast('辨識失敗：' + msg);
+      document.getElementById('scan-load').style.display = 'none';
+      useMock();
+      return;
+    }
+
     const d = await res.json();
     const txt = d.content?.map(c => c.text || '').join('') || '';
     curScan = JSON.parse(txt.replace(/```json|```/g, '').trim());
     showResult(curScan);
-  } catch (err) { console.error(err); showToast('辨識失敗，使用示範資料'); useMock(); }
+  } catch (err) {
+    console.error(err);
+    showToast('辨識失敗，使用示範資料');
+    useMock();
+  }
 }
 
 function useMock() {
@@ -1112,13 +1141,17 @@ function closeSuc() { document.getElementById('suc-overlay').classList.remove('s
 function saveApiKey() {
   const v = document.getElementById('api-key-input').value;
   if (v && !v.includes('•')) {
-    apiKey = v;
-    localStorage.setItem('jak', apiKey);
+    appPassword = v;
+    localStorage.setItem('jak', appPassword);
     document.getElementById('api-key-input').value = '••••••••••••';
     const s = document.getElementById('api-key-status');
     s.style.display = 'block';
     setTimeout(() => s.style.display = 'none', 2000);
-    showToast('API Key 已儲存');
+    showToast('已儲存');
+  } else if (!v) {
+    appPassword = '';
+    localStorage.removeItem('jak');
+    showToast('已清空密碼');
   }
 }
 
