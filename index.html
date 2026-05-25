@@ -487,6 +487,7 @@ let members = JSON.parse(localStorage.getItem('jm') || '["我","旅伴"]');
 const DEFAULT_PAY_METHODS = ['現金', 'Suica', 'PayPay', '國泰CUBE卡', '台新Richart', '台新太陽JCB', '玉山熊本卡', '信用卡'];
 let payMethods = JSON.parse(localStorage.getItem('jp') || JSON.stringify(DEFAULT_PAY_METHODS));
 let curCat = '餐飲', curPay = payMethods[0] || '現金', curPayer = '', curScan = null, vm = 'date';
+let payEditMode = false;
 
 const SHEET = 'https://script.google.com/macros/s/AKfycbzyrSFmkYeKt8MlNU54Jx9Ut_IThJI6DwpSIoRcHIN4ayxpUMBWO7opPofAW_peD-GzIg/exec';
 const CI = { '餐飲':'🍜', '購物':'🛍', '交通':'🚃', '住宿':'🏨', '其他':'📦' };
@@ -1041,10 +1042,26 @@ function removeMember(i) {
 function renderPayMethods() {
   if (!payMethods.includes(curPay)) curPay = payMethods[0] || '現金';
   const el = document.getElementById('paymethod-chips');
-  if (el) el.innerHTML = payMethods.map(m =>
-    `<button class="chip${m === curPay ? ' on-g on' : ''}" data-pay="${escAttr(m)}" onclick="selPay(this)">${esc(m)}</button>`
-  ).join('');
+  if (el) {
+    if (payEditMode) {
+      el.innerHTML = payMethods.map((m, i) =>
+        `<span class="chip" style="display:inline-flex;align-items:center;gap:6px;padding-right:8px;cursor:default;">${esc(m)}<button onclick="removePayMethod(${i})" style="background:rgba(255,59,48,0.15);border:none;color:var(--red);font-size:11px;font-weight:700;border-radius:50%;width:18px;height:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;padding:0;">✕</button></span>`
+      ).join('') +
+      `<button class="chip" onclick="addPayMethod()" style="border-style:dashed;color:var(--brand);">＋ 新增</button>` +
+      `<button class="chip on-g on" onclick="togglePayEditMode()">✓ 完成</button>`;
+    } else {
+      el.innerHTML = payMethods.map(m =>
+        `<button class="chip${m === curPay ? ' on-g on' : ''}" data-pay="${escAttr(m)}" onclick="selPay(this)">${esc(m)}</button>`
+      ).join('') +
+      `<button class="chip" onclick="togglePayEditMode()" style="border-style:dashed;color:var(--secondary);">✏️ 編輯</button>`;
+    }
+  }
   renderPayMethodSettings();
+}
+
+function togglePayEditMode() {
+  payEditMode = !payEditMode;
+  renderPayMethods();
 }
 
 function renderPayMethodSettings() {
