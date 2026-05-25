@@ -8,7 +8,10 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="旅帳">
 <link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="icon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="icon-180.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+<link rel="icon" type="image/svg+xml" href="icon.svg">
 <title>旅帳</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
@@ -201,8 +204,9 @@
   .ic-b { background:rgba(0,122,255,0.12); } .ic-o { background:rgba(255,107,0,0.12); }
   .ic-g { background:rgba(52,199,89,0.12); } .ic-r { background:rgba(255,59,48,0.12); }
   .ic-p { background:rgba(175,82,222,0.12); }
-  .set-nm { font-size:16px; }
-  .set-inp { border:none; outline:none; font-size:15px; color:var(--secondary); text-align:right; background:transparent; font-family:'Noto Sans TC',sans-serif; }
+  .set-nm { font-size:16px; white-space:nowrap; }
+  .set-l { flex-shrink:0; min-width:0; }
+  .set-inp { border:none; outline:none; font-size:15px; color:var(--secondary); text-align:right; background:transparent; font-family:'Noto Sans TC',sans-serif; min-width:0; }
   .chev { color:var(--tertiary); font-size:18px; margin-left:4px; }
 
   .api-wrap { margin:0 16px 24px; }
@@ -401,7 +405,7 @@
     <div class="set-grp">
       <div class="set-grp-t">旅程</div>
       <div class="set-list">
-        <div class="set-row"><div class="set-l"><div class="set-ic ic-o">✈️</div><div class="set-nm">旅程名稱</div></div><div style="display:flex;align-items:center;"><input class="set-inp" id="trip-name-input" value="日本北陸之旅" onchange="updateTripName()"><span class="chev">›</span></div></div>
+        <div class="set-row"><div class="set-l"><div class="set-ic ic-o">✈️</div><div class="set-nm">旅程名稱</div></div><div style="display:flex;align-items:center;"><input class="set-inp" id="trip-name-input" value="日本北陸之旅" style="width:160px;" onchange="updateTripName()"><span class="chev">›</span></div></div>
         <div class="set-row"><div class="set-l"><div class="set-ic ic-g">💰</div><div class="set-nm">旅行預算</div></div><div style="display:flex;align-items:center;"><span style="color:var(--secondary);font-size:15px;">¥</span><input class="set-inp" id="budget-input" value="100000" type="number" style="width:80px;" onchange="updateBudget()"><span class="chev">›</span></div></div>
         <div class="set-row"><div class="set-l"><div class="set-ic ic-b">📅</div><div class="set-nm">出發日期</div></div><div style="display:flex;align-items:center;"><input class="set-inp" id="start-date-input" type="date" style="width:130px;" onchange="updateStartDate()"><span class="chev">›</span></div></div>
         <div class="set-row"><div class="set-l"><div class="set-ic ic-p">💱</div><div class="set-nm">JPY → TWD</div></div><div style="display:flex;align-items:center;"><input class="set-inp" id="rate-input" value="0.206" type="number" step="0.001" style="width:60px;" onchange="updateRate()"><span class="chev">›</span></div></div>
