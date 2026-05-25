@@ -484,7 +484,7 @@ let records = JSON.parse(localStorage.getItem('jr') || '[]');
 let settings = Object.assign({}, DEFAULT_SETTINGS, JSON.parse(localStorage.getItem('js') || '{}'));
 let appPassword = localStorage.getItem('jak') || '';
 let members = JSON.parse(localStorage.getItem('jm') || '["我","旅伴"]');
-const DEFAULT_PAY_METHODS = ['現金', 'Suica', 'PayPay', '國泰CUBE卡', '聯邦吉鶴卡', '玉山Pi卡', '中信LINE Pay卡', '信用卡'];
+const DEFAULT_PAY_METHODS = ['現金', 'Suica', 'PayPay', '國泰CUBE卡', '台新Richart', '台新太陽JCB', '玉山熊本卡', '信用卡'];
 let payMethods = JSON.parse(localStorage.getItem('jp') || JSON.stringify(DEFAULT_PAY_METHODS));
 let curCat = '餐飲', curPay = payMethods[0] || '現金', curPayer = '', curScan = null, vm = 'date';
 
