@@ -265,7 +265,7 @@
       <div class="bbar-bg"><div class="bbar" id="bbar" style="width:0%"></div></div>
       <div class="budget-foot"><span id="bused">已用 ¥0</span><span id="btot">預算 ¥100,000</span></div>
     </div>
-    <div class="sec-hd"><div class="sec-title">今日花費</div><div class="sec-link" onclick="switchTab('records')">查看全部</div></div>
+    <div class="sec-hd"><div class="sec-title">今日花費</div><div style="display:flex;align-items:center;gap:14px;"><span class="sec-link" id="home-edit-btn" onclick="toggleRecordEditMode()">編輯</span><span class="sec-link" onclick="switchTab('records')">查看全部</span></div></div>
     <div id="today-list"></div>
     <div style="height:24px;"></div>
   </div>
@@ -282,7 +282,7 @@
 <div class="screen" id="screen-records">
   <div class="sbar"><span class="sbar-time">9:41</span><span class="sbar-right">旅帳</span></div>
   <div class="scroll">
-    <div class="nav"><div class="nav-title">消費紀錄</div></div>
+    <div class="nav" style="display:flex;justify-content:space-between;align-items:center;padding-right:20px;"><div class="nav-title">消費紀錄</div><button id="rec-edit-btn" onclick="toggleRecordEditMode()" style="background:none;border:none;color:var(--blue);font-size:15px;font-weight:500;cursor:pointer;font-family:'Noto Sans TC',sans-serif;">編輯</button></div>
     <div class="total-card"><div class="total-lbl" id="rec-month-lbl">旅行總支出</div><div class="total-amt" id="rec-total">¥0</div><div class="total-sub" id="rec-sub">NT$0 · 0 筆</div></div>
     <div class="search-wrap"><input class="search-inp" id="search-inp" placeholder="🔍 搜尋店家或品項..." oninput="refreshRecords()"></div>
     <div class="seg"><button class="seg-btn on" id="seg-d" onclick="toggleView('date')">按日期</button><button class="seg-btn" id="seg-c" onclick="toggleView('cat')">按類別</button></div>
@@ -324,6 +324,9 @@
       <div class="scan-load" id="scan-load"><div class="spin"></div><p>AI 辨識中...</p></div>
     </div>
     <div class="res-wrap" id="res-wrap">
+      <div style="display:flex;justify-content:flex-end;margin-bottom:8px;">
+        <button onclick="cancelScan()" style="background:rgba(60,60,67,0.08);border:none;color:var(--secondary);font-size:13px;font-weight:500;cursor:pointer;font-family:'Noto Sans TC',sans-serif;padding:7px 14px;border-radius:18px;">↩ 重來</button>
+      </div>
       <div class="store-card">
         <div class="store-big" id="s-name" contenteditable="true" spellcheck="false" onblur="updateStoreName(this)"></div>
         <div class="store-jp" id="s-jp"></div>
@@ -488,6 +491,7 @@ const DEFAULT_PAY_METHODS = ['現金', 'Suica', 'PayPay', '國泰CUBE卡', '台�
 let payMethods = JSON.parse(localStorage.getItem('jp') || JSON.stringify(DEFAULT_PAY_METHODS));
 let curCat = '餐飲', curPay = payMethods[0] || '現金', curPayer = '', curScan = null, vm = 'date';
 let payEditMode = false;
+let recordEditMode = false;
 
 const SHEET = 'https://script.google.com/macros/s/AKfycbzyrSFmkYeKt8MlNU54Jx9Ut_IThJI6DwpSIoRcHIN4ayxpUMBWO7opPofAW_peD-GzIg/exec';
 const CI = { '餐飲':'🍜', '購物':'🛍', '交通':'🚃', '住宿':'🏨', '其他':'📦' };
@@ -637,17 +641,20 @@ function rcardHTML(r) {
     </div>`;
   }).join('');
   const rid = 'r' + r.id;
+  const delQuick = recordEditMode
+    ? `<button onclick="deleteRecord(${r.id},event)" style="background:rgba(255,59,48,0.12);border:none;color:var(--red);font-size:13px;font-weight:700;border-radius:50%;width:28px;height:28px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;line-height:1;padding:0;">✕</button>` : '';
   return `<div class="rcard fi" style="flex-direction:column;align-items:stretch;">
     <div style="display:flex;align-items:center;gap:12px;cursor:pointer;" onclick="toggleDetail('${rid}')">
       <div class="rcard-icon" style="background:${CC[r.category] || '#8E8E93'}22;">${CI[r.category] || '📦'}</div>
       <div class="rcard-info"><div class="rcard-name">${esc(r.storeName)}</div><div class="rcard-meta">${esc(r.category)} · ${esc(r.payMethod)}${payer}</div></div>
       <div class="rcard-amt"><div class="rcard-jpy">¥${fmt(r.total)}</div><div class="rcard-twd">NT$${fmt(twd(r.total))}</div></div>
+      ${delQuick}
     </div>
     <div id="${rid}" style="display:none;margin-top:10px;padding-top:6px;border-top:0.5px solid var(--sep);">
       ${itemsHTML || '<div style="font-size:13px;color:var(--secondary);padding:6px 0;">無品項明細</div>'}
-      <div style="display:flex;justify-content:flex-end;padding-top:10px;">
+      ${recordEditMode ? '' : `<div style="display:flex;justify-content:flex-end;padding-top:10px;">
         <button class="del-btn" onclick="deleteRecord(${r.id},event)">刪除此筆</button>
-      </div>
+      </div>`}
     </div>
   </div>`;
 }
@@ -686,6 +693,20 @@ function deleteRecord(id, e) {
   saveRecords();
   showToast('已刪除');
   refreshHome(); refreshRecords(); refreshStats();
+}
+
+function toggleRecordEditMode() {
+  recordEditMode = !recordEditMode;
+  const txt = recordEditMode ? '完成' : '編輯';
+  ['rec-edit-btn', 'home-edit-btn'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.textContent = txt;
+      el.style.color = recordEditMode ? 'var(--red)' : 'var(--blue)';
+    }
+  });
+  refreshHome();
+  refreshRecords();
 }
 
 // === RECORDS ===
@@ -889,6 +910,20 @@ function startManual() {
   curScan = { storeName: '手動輸入', storeNameJp: '', date: today(), total: 0, items: [] };
   document.getElementById('prev-wrap').style.display = 'none';
   showResult(curScan);
+}
+
+function cancelScan() {
+  if (curScan && curScan.items && curScan.items.length > 0) {
+    if (!confirm('確定丟棄目前的辨識結果，重新拍照？')) return;
+  }
+  curScan = null;
+  document.getElementById('prev-wrap').style.display = 'none';
+  document.getElementById('res-wrap').style.display = 'none';
+  document.getElementById('scan-load').style.display = 'none';
+  document.getElementById('items-list').innerHTML = '';
+  // 重置輸入元素
+  const fc = document.getElementById('fc'); if (fc) fc.value = '';
+  const fl = document.getElementById('fl'); if (fl) fl.value = '';
 }
 
 function showResult(data) {
