@@ -75,16 +75,6 @@
   .mchip { flex-shrink:0; padding:6px 14px; border-radius:18px; border:1.5px solid var(--sep); background:var(--card); font-size:13px; font-weight:500; cursor:pointer; color:var(--label); font-family:'Noto Sans TC',sans-serif; white-space:nowrap; }
   .mchip.on { border-color:var(--brand); background:rgba(27,148,49,0.1); color:var(--brand); font-weight:600; }
 
-  /* BUDGET */
-  .budget { margin:0 16px 16px; background:var(--card); border-radius:16px; padding:16px; }
-  .budget-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
-  .budget-lbl { font-size:15px; font-weight:600; }
-  .budget-pct { font-size:15px; font-weight:600; color:var(--green); }
-  .bbar-bg { height:6px; background:var(--fill); border-radius:99px; overflow:hidden; margin-bottom:8px; }
-  .bbar { height:100%; background:var(--green); border-radius:99px; transition:width 0.8s; }
-  .budget-foot { display:flex; justify-content:space-between; }
-  .budget-foot span { font-size:13px; color:var(--secondary); }
-
   /* SECTION */
   .sec-hd { display:flex; justify-content:space-between; align-items:center; padding:0 20px 8px; }
   .sec-title { font-size:20px; font-weight:700; letter-spacing:-0.3px; }
@@ -260,11 +250,6 @@
       <div class="hero-bg">¥</div>
     </div>
     <div class="month-chips" id="month-chips-d"></div>
-    <div class="budget">
-      <div class="budget-row"><div class="budget-lbl">預算進度</div><div class="budget-pct" id="bpct">0%</div></div>
-      <div class="bbar-bg"><div class="bbar" id="bbar" style="width:0%"></div></div>
-      <div class="budget-foot"><span id="bused">已用 ¥0</span><span id="btot">預算 ¥100,000</span></div>
-    </div>
     <div class="sec-hd"><div class="sec-title">今日花費</div><div style="display:flex;align-items:center;gap:14px;"><span class="sec-link" id="home-edit-btn" onclick="toggleRecordEditMode()">編輯</span><span class="sec-link" onclick="switchTab('records')">查看全部</span></div></div>
     <div id="today-list"></div>
     <div style="height:24px;"></div>
@@ -404,7 +389,6 @@
       <div class="set-grp-t">旅程</div>
       <div class="set-list">
         <div class="set-row"><div class="set-l"><div class="set-ic ic-o">✈️</div><div class="set-nm">旅程名稱</div></div><div style="display:flex;align-items:center;"><input class="set-inp" id="trip-name-input" value="日本北陸之旅" style="width:160px;" onchange="updateTripName()"><span class="chev">›</span></div></div>
-        <div class="set-row"><div class="set-l"><div class="set-ic ic-g">💰</div><div class="set-nm">旅行預算</div></div><div style="display:flex;align-items:center;"><span style="color:var(--secondary);font-size:15px;">¥</span><input class="set-inp" id="budget-input" value="100000" type="number" style="width:80px;" onchange="updateBudget()"><span class="chev">›</span></div></div>
         <div class="set-row"><div class="set-l"><div class="set-ic ic-b">📅</div><div class="set-nm">出發日期</div></div><div style="display:flex;align-items:center;"><input class="set-inp" id="start-date-input" type="date" style="width:130px;" onchange="updateStartDate()"><span class="chev">›</span></div></div>
         <div class="set-row"><div class="set-l"><div class="set-ic ic-p">💱</div><div class="set-nm">JPY → TWD</div></div><div style="display:flex;align-items:center;"><input class="set-inp" id="rate-input" value="0.206" type="number" step="0.001" style="width:60px;" onchange="updateRate()"><span class="chev">›</span></div></div>
       </div>
@@ -523,9 +507,12 @@ function currentRecords() {
 
 function dayN() {
   if (!settings.startDate) return 1;
-  const d = new Date(settings.startDate);
-  if (isNaN(d.getTime())) return 1;
-  return Math.max(1, Math.floor((new Date() - d) / 86400000) + 1);
+  const parts = settings.startDate.split('-').map(Number);
+  if (parts.length !== 3 || parts.some(isNaN)) return 1;
+  const start = new Date(parts[0], parts[1] - 1, parts[2]);
+  const n = new Date();
+  const today0 = new Date(n.getFullYear(), n.getMonth(), n.getDate());
+  return Math.max(1, Math.round((today0 - start) / 86400000) + 1);
 }
 
 function save() { localStorage.setItem('js', JSON.stringify(settings)); }
@@ -537,7 +524,6 @@ function init() {
   setInterval(updateClock, 1000);
   document.getElementById('api-key-input').value = appPassword ? '••••••••••••' : '';
   document.getElementById('trip-name-input').value = settings.tripName;
-  document.getElementById('budget-input').value = settings.budget;
   document.getElementById('start-date-input').value = settings.startDate;
   document.getElementById('rate-input').value = settings.rate;
   document.getElementById('theme-toggle').checked = settings.theme === 'dark';
@@ -594,15 +580,6 @@ function refreshHome() {
   document.getElementById('h-today-t').textContent = 'NT$' + fmt(twd(ta));
   document.getElementById('h-total').textContent = '¥' + fmt(all);
   document.getElementById('h-total-t').textContent = 'NT$' + fmt(twd(all));
-
-  const p = settings.budget > 0 ? Math.min(100, Math.round(all / settings.budget * 100)) : 0;
-  document.getElementById('bpct').textContent = p + '%';
-  const bcolor = p > 80 ? 'var(--red)' : p > 50 ? '#FF9500' : 'var(--green)';
-  document.getElementById('bpct').style.color = bcolor;
-  document.getElementById('bbar').style.width = p + '%';
-  document.getElementById('bbar').style.background = bcolor;
-  document.getElementById('bused').textContent = '已用 ¥' + fmt(all);
-  document.getElementById('btot').textContent = '預算 ¥' + fmt(settings.budget);
 
   renderMonthChips();
 
@@ -955,7 +932,7 @@ function renderItems(items) {
     return `<div class="ritem" id="row-${i}">
       <div class="ritem-num">${i + 1}</div>
       <div class="ritem-info">
-        <div class="ritem-name" id="nm-${i}">${esc(item.name || '')}</div>
+        <div class="ritem-name" id="nm-${i}" contenteditable="true" spellcheck="false" onblur="updateItemName(${i}, this)" onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}" style="outline:none;border-bottom:1px dashed var(--tertiary);display:inline-block;min-width:50px;">${esc(item.name || '')}</div>
         <div class="ritem-jp">${esc(item.nameJp || '')} ${esc(item.tax || '')}</div>
       </div>
       <div style="display:flex;align-items:center;gap:6px;">
@@ -975,7 +952,17 @@ function addItem() {
   curScan.total = curScan.items.reduce((s, it) => s + (it.price || 0), 0);
   renderItems(curScan.items);
   document.getElementById('cfm-btn').textContent = `確認儲存（${curScan.items.length} 筆）`;
-  setTimeout(() => editItem(curScan.items.length - 1), 50);
+  setTimeout(() => {
+    const el = document.getElementById('nm-' + (curScan.items.length - 1));
+    if (el) {
+      el.focus();
+      const range = document.createRange();
+      range.selectNodeContents(el);
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+    }
+  }, 60);
 }
 
 function removeItem(i) {
@@ -994,17 +981,21 @@ function cycleSplit(i) {
   renderItems(curScan.items);
 }
 
+function updateItemName(i, el) {
+  if (!curScan || !curScan.items[i]) return;
+  const v = el.textContent.trim();
+  if (v) { curScan.items[i].name = v; }
+  else { el.textContent = curScan.items[i].name || ''; }
+}
+
 function editItem(i) {
   const item = curScan.items[i];
-  document.getElementById('nm-' + i).innerHTML = `<input id="en-${i}" value="${escAttr(item.name || '')}" style="border:1.5px solid var(--sep);border-radius:8px;padding:4px 8px;font-size:14px;width:110px;font-family:'Noto Sans TC',sans-serif;outline:none;background:var(--bg);color:var(--ink);">`;
   document.getElementById('pr-' + i).innerHTML = `<div style="display:flex;align-items:center;gap:4px;">¥<input id="ep-${i}" type="number" value="${item.price}" style="border:1.5px solid var(--sep);border-radius:8px;padding:4px 6px;font-size:14px;width:70px;outline:none;background:var(--bg);color:var(--ink);"><button onclick="saveItem(${i})" style="background:var(--green);color:white;border:none;border-radius:8px;padding:5px 10px;font-size:13px;cursor:pointer;font-family:'Noto Sans TC',sans-serif;">✓</button></div>`;
-  document.getElementById('en-' + i).focus();
+  document.getElementById('ep-' + i).focus();
 }
 
 function saveItem(i) {
-  const n = document.getElementById('en-' + i)?.value?.trim() || curScan.items[i].name;
   const p = parseInt(document.getElementById('ep-' + i)?.value);
-  curScan.items[i].name = n;
   curScan.items[i].price = isNaN(p) ? curScan.items[i].price : Math.max(0, p);
   curScan.total = curScan.items.reduce((s, it) => s + (it.price || 0), 0);
   renderItems(curScan.items);
@@ -1297,7 +1288,6 @@ function updateTripName() {
   refreshHome();
 }
 
-function updateBudget() { settings.budget = parseInt(document.getElementById('budget-input').value) || 100000; save(); refreshHome(); }
 function updateStartDate() { settings.startDate = document.getElementById('start-date-input').value; save(); refreshHome(); }
 function updateRate() { settings.rate = parseFloat(document.getElementById('rate-input').value) || 0.206; save(); refreshHome(); refreshRecords(); refreshStats(); }
 
