@@ -422,6 +422,13 @@
       </div>
     </div>
     <div class="set-grp">
+      <div class="set-grp-t">應用程式</div>
+      <div class="set-list">
+        <div class="set-row" onclick="forceUpdate()"><div class="set-l"><div class="set-ic ic-b">🔄</div><div class="set-nm">檢查更新</div></div><div style="display:flex;align-items:center;gap:6px;"><span style="font-size:13px;color:var(--secondary);">v4</span><span class="chev">›</span></div></div>
+      </div>
+      <div style="font-size:12px;color:var(--secondary);padding:6px 4px 0;">抓取最新版本程式碼，你的記錄與設定不會遺失。</div>
+    </div>
+    <div class="set-grp">
       <div class="set-grp-t">資料</div>
       <div class="set-list">
         <div class="set-row" onclick="exportData()"><div class="set-l"><div class="set-ic ic-b">📤</div><div class="set-nm">匯出備份 (JSON)</div></div><span class="chev">›</span></div>
@@ -433,7 +440,7 @@
         <div class="set-row" onclick="clearAll()"><div class="set-l"><div class="set-ic ic-r">🗑</div><div class="set-nm" style="color:var(--red);">清除所有記錄</div></div><span class="chev">›</span></div>
       </div>
     </div>
-    <div style="text-align:center;font-size:11px;color:var(--secondary);padding:8px 0 16px;">旅帳 v3 · Vercel + 本地儲存</div>
+    <div style="text-align:center;font-size:11px;color:var(--secondary);padding:8px 0 16px;">旅帳 v4 · Vercel + 本地儲存</div>
   </div>
   <div class="tabbar">
     <button class="tab" onclick="switchTab('home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>首頁</span></button>
@@ -1297,6 +1304,22 @@ function clearAll() {
   localStorage.removeItem('jr');
   refreshHome(); refreshRecords(); refreshStats();
   showToast('已清除');
+}
+
+async function forceUpdate() {
+  if (!confirm('抓取最新版本？\n你的記錄與設定都會保留，只會更新程式碼。')) return;
+  showToast('更新中，請稍候...');
+  try {
+    if ('caches' in window) {
+      const keys = await caches.keys();
+      await Promise.all(keys.map(k => caches.delete(k)));
+    }
+    if ('serviceWorker' in navigator) {
+      const regs = await navigator.serviceWorker.getRegistrations();
+      await Promise.all(regs.map(r => r.unregister()));
+    }
+  } catch (e) { console.error(e); }
+  setTimeout(() => location.reload(), 500);
 }
 
 // === EXPORT / IMPORT ===
