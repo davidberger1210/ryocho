@@ -783,9 +783,24 @@ function refreshStats() {
     return `<div class="catrow"><div class="catdot" style="background:${CC[cat]}"></div><div class="catname">${esc(cat)}</div><div class="catbg"><div class="catfill" style="width:${p}%;background:${CC[cat]}"></div></div><div class="catpct">${p}%</div><div class="catamt">¥${fmt(val)}</div></div>`;
   }).join('') || '<div style="color:var(--secondary);font-size:14px;text-align:center;padding:20px;">尚無資料</div>';
 
-  document.getElementById('top10-list').innerHTML = monthRecs.slice().sort((a, b) => b.total - a.total).slice(0, 10).map((r, i) =>
-    `<div class="topitem"><div class="toprank${i === 0 ? ' g' : ''}">${i === 0 ? '🥇' : i + 1}</div><div class="topname">${esc(r.storeName)}</div><div class="topamt">¥${fmt(r.total)}</div></div>`
-  ).join('') || '<div style="color:var(--secondary);font-size:14px;text-align:center;padding:20px;">尚無資料</div>';
+  document.getElementById('top10-list').innerHTML = monthRecs.slice().sort((a, b) => b.total - a.total).slice(0, 10).map((r, i) => {
+    const tid = 'top-' + r.id;
+    const itemsHTML = (r.items || []).length
+      ? r.items.map(it => `<div style="display:flex;justify-content:space-between;padding:5px 0;font-size:13px;"><span style="flex:1;color:var(--label);">${esc(it.name || '')}</span><span style="color:var(--secondary);margin-left:8px;">¥${fmt(it.price)}</span></div>`).join('')
+      : '<div style="font-size:12px;color:var(--secondary);padding:4px 0;">無品項明細</div>';
+    return `<div>
+      <div class="topitem" style="cursor:pointer;" onclick="toggleDetail('${tid}')">
+        <div class="toprank${i === 0 ? ' g' : ''}">${i === 0 ? '🥇' : i + 1}</div>
+        <div class="topname">${esc(r.storeName)}</div>
+        <div class="topamt">¥${fmt(r.total)}</div>
+        <div style="color:var(--tertiary);font-size:12px;margin-left:4px;">›</div>
+      </div>
+      <div id="${tid}" style="display:none;padding:6px 12px 12px 38px;">
+        <div style="font-size:11px;color:var(--secondary);margin-bottom:6px;">${esc(r.date)} · ${esc(r.category)} · ${esc(r.payMethod)}${r.payer ? ' · ' + esc(r.payer) : ''}</div>
+        ${itemsHTML}
+      </div>
+    </div>`;
+  }).join('') || '<div style="color:var(--secondary);font-size:14px;text-align:center;padding:20px;">尚無資料</div>';
 
   // === 結算（修正版：考慮 payer）===
   const m0 = members[0] || '我', m1 = members[1] || '旅伴';
