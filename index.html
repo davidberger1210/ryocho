@@ -131,7 +131,8 @@
 
   .res-wrap { margin:0 16px; display:none; }
   .store-card { background:var(--card); border-radius:16px; padding:16px; margin-bottom:10px; }
-  .store-big { font-size:22px; font-weight:700; letter-spacing:-0.5px; }
+  .store-big { font-size:22px; font-weight:700; letter-spacing:-0.5px; outline:none; min-height:28px; }
+  .store-big[contenteditable]:empty:before { content: attr(data-placeholder); color: var(--tertiary); font-weight:600; }
   .store-jp { font-size:13px; color:var(--secondary); margin-top:2px; }
   .store-dt { font-size:13px; color:var(--blue); margin-top:6px; font-weight:500; }
 
@@ -313,7 +314,7 @@
         <button onclick="cancelScan()" style="background:rgba(60,60,67,0.08);border:none;color:var(--secondary);font-size:13px;font-weight:500;cursor:pointer;font-family:'Noto Sans TC',sans-serif;padding:7px 14px;border-radius:18px;">↩ 重來</button>
       </div>
       <div class="store-card">
-        <div class="store-big" id="s-name" contenteditable="true" spellcheck="false" onblur="updateStoreName(this)"></div>
+        <div class="store-big" id="s-name" contenteditable="true" spellcheck="false" data-placeholder="點此輸入店家名稱" onblur="updateStoreName(this)"></div>
         <div class="store-jp" id="s-jp"></div>
         <div class="store-dt" id="s-date"></div>
       </div>
@@ -525,7 +526,23 @@ function dayN() {
 function save() { localStorage.setItem('js', JSON.stringify(settings)); }
 function saveRecords() { localStorage.setItem('jr', JSON.stringify(records)); }
 
+function migrateManualEntries() {
+  let changed = 0;
+  records.forEach(r => {
+    if (r.storeName === '手動輸入') {
+      const items = r.items || [];
+      const valid = items.map(i => (i.name || '').trim()).filter(n => n && n !== '新品項');
+      if (valid.length) {
+        r.storeName = valid.length > 1 ? `${valid[0]} 等` : valid[0];
+        changed++;
+      }
+    }
+  });
+  if (changed) saveRecords();
+}
+
 function init() {
+  migrateManualEntries();
   applyTheme();
   updateClock();
   setInterval(updateClock, 1000);
@@ -891,7 +908,7 @@ function useMock() {
 }
 
 function startManual() {
-  curScan = { storeName: '手動輸入', storeNameJp: '', date: today(), total: 0, items: [] };
+  curScan = { storeName: '', storeNameJp: '', date: today(), total: 0, items: [] };
   document.getElementById('prev-wrap').style.display = 'none';
   showResult(curScan);
 }
@@ -912,7 +929,7 @@ function cancelScan() {
 
 function showResult(data) {
   document.getElementById('scan-load').style.display = 'none';
-  document.getElementById('s-name').textContent = data.storeName || '未知店家';
+  document.getElementById('s-name').textContent = data.storeName || '';
   document.getElementById('s-jp').textContent = data.storeNameJp || '';
   document.getElementById('s-date').textContent = data.date || today();
   renderItems(data.items || []);
@@ -921,7 +938,7 @@ function showResult(data) {
 }
 
 function updateStoreName(el) {
-  if (curScan) curScan.storeName = el.textContent.trim() || '未知店家';
+  if (curScan) curScan.storeName = el.textContent.trim();
 }
 
 function renderItems(items) {
@@ -1211,13 +1228,22 @@ function removeMonth(i, e) {
 }
 
 // === SAVE / SYNC ===
+function deriveStoreName(scan) {
+  const sn = (scan.storeName || '').trim();
+  if (sn && sn !== '手動輸入' && sn !== '未知店家') return sn;
+  const items = scan.items || [];
+  const validItems = items.map(i => (i.name || '').trim()).filter(n => n && n !== '新品項');
+  if (validItems.length === 0) return '未命名';
+  return validItems.length > 1 ? `${validItems[0]} 等` : validItems[0];
+}
+
 function saveReceipt() {
   if (!curScan) return;
   if (!curScan.items || !curScan.items.length) { showToast('請至少新增一個品項'); return; }
   const m = curMonth();
   const rec = {
     id: Date.now(),
-    storeName: curScan.storeName || '未知店家',
+    storeName: deriveStoreName(curScan),
     storeNameJp: curScan.storeNameJp || '',
     date: curScan.date || today(),
     total: curScan.total || curScan.items.reduce((s, i) => s + (i.price || 0), 0),
