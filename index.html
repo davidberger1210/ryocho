@@ -156,6 +156,8 @@
   .chip.on { border-color:var(--blue); background:rgba(0,122,255,0.08); color:var(--blue); }
   .chip.on-g { border-color:var(--green); background:rgba(52,199,89,0.08); color:var(--green); }
 
+  .split-sel { appearance:none; -webkit-appearance:none; font-size:11px; font-weight:600; border-width:1.5px; border-style:solid; border-radius:14px; padding:4px 22px 4px 10px; cursor:pointer; font-family:'Noto Sans TC',sans-serif; background-position:right 7px center; background-repeat:no-repeat; background-size:9px 7px; background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 8'><path d='M1 1l4 5 4-5' stroke='%23666' stroke-width='1.6' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>"); outline:none; }
+
   .cfm-btn { width:100%; padding:17px; background:var(--brand); color:white; border:none; border-radius:16px; font-size:17px; font-weight:700; cursor:pointer; margin-bottom:6px; font-family:'Noto Sans TC',sans-serif; box-shadow:0 4px 16px rgba(27,148,49,0.3); transition:all 0.15s; }
   .cfm-btn:active { transform:scale(0.98); }
   .cfm-sub { text-align:center; font-size:12px; color:var(--secondary); margin-bottom:16px; }
@@ -626,19 +628,15 @@ function renderMonthChips() {
 }
 
 function rcardHTML(r) {
-  const m0 = members[0] || '我', m1 = members[1] || '旅伴';
-  const splitLabel = { 'aa': 'AA', 'solo0': m0 + '付', 'solo1': m1 + '付', 'owe01': m0 + '欠' + m1, 'owe10': m1 + '欠' + m0 };
   const payer = r.payer && r.payer !== 'undefined' && r.payer !== 'null' ? ' · ' + esc(r.payer) : '';
   const recIdx = records.indexOf(r);
   const itemsHTML = (r.items || []).map((item, ii) => {
-    const lbl = splitLabel[item.split] || 'AA';
-    const sl = item.split ? `<span style="font-size:10px;color:var(--blue);background:rgba(0,122,255,0.08);border-radius:10px;padding:1px 6px;margin-left:4px;">${esc(lbl)}</span>` : '';
-    return `<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:0.5px solid var(--sep);">
-      <div style="font-size:14px;flex:1;display:flex;align-items:center;gap:4px;flex-wrap:wrap;">
+    return `<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:0.5px solid var(--sep);gap:6px;">
+      <div style="font-size:14px;flex:1;min-width:0;">
         <span id="rn-${recIdx}-${ii}" contenteditable="true" spellcheck="false" onblur="updateRecordItemName(${recIdx},${ii},this,event)" onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}" style="outline:none;border-bottom:1px dashed var(--tertiary);min-width:40px;display:inline-block;">${esc(item.name || '')}</span>
-        ${sl}
       </div>
-      <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;margin-left:8px;">
+      <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+        ${splitSelectHTML(item.split, `setRecordSplit(${recIdx},${ii},this.value,event)`)}
         <div id="rp-${recIdx}-${ii}" style="font-size:14px;font-weight:500;">¥${fmt(item.price)}</div>
         <button onclick="editRecordItem(${recIdx},${ii},event)" style="background:none;border:none;cursor:pointer;font-size:14px;color:var(--secondary);padding:2px;">✎</button>
       </div>
@@ -974,18 +972,28 @@ function updateStoreName(el) {
   if (curScan) curScan.storeName = el.textContent.trim();
 }
 
+const SPLIT_OPTS = [
+  ['aa', m => m[0] + '/' + m[1] + ' 平分'],
+  ['solo0', m => m[0] + ' 全付'],
+  ['solo1', m => m[1] + ' 全付'],
+  ['owe01', m => m[0] + ' 欠 ' + m[1]],
+  ['owe10', m => m[1] + ' 欠 ' + m[0]]
+];
+
+function splitColor(s) {
+  return { 'aa':'var(--blue)', 'solo0':'var(--secondary)', 'solo1':'var(--secondary)', 'owe01':'var(--red)', 'owe10':'var(--brand)' }[s] || 'var(--blue)';
+}
+
+function splitSelectHTML(currentValue, onChangeCall) {
+  const ms = [members[0] || '我', members[1] || '旅伴'];
+  const cur = currentValue || 'aa';
+  const color = splitColor(cur);
+  const opts = SPLIT_OPTS.map(([v, fn]) => `<option value="${v}"${cur === v ? ' selected' : ''}>${esc(fn(ms))}</option>`).join('');
+  return `<select class="split-sel" onchange="${onChangeCall}" style="color:${color};border-color:${color}55;background-color:${color}14;">${opts}</select>`;
+}
+
 function renderItems(items) {
-  const m0 = members[0] || '我', m1 = members[1] || '旅伴';
   document.getElementById('items-list').innerHTML = items.map((item, i) => {
-    const split = item.split || 'aa';
-    const splitLabel = {
-      'aa': 'AA',
-      'solo0': m0 + '付',
-      'solo1': m1 + '付',
-      'owe01': m0 + '欠' + m1,
-      'owe10': m1 + '欠' + m0
-    }[split] || 'AA';
-    const splitColor = { 'aa': 'var(--blue)', 'solo0': 'var(--secondary)', 'solo1': 'var(--secondary)', 'owe01': 'var(--red)', 'owe10': 'var(--brand)' }[split] || 'var(--blue)';
     return `<div class="ritem" id="row-${i}">
       <div class="ritem-num">${i + 1}</div>
       <div class="ritem-info">
@@ -993,13 +1001,19 @@ function renderItems(items) {
         <div class="ritem-jp">${esc(item.nameJp || '')} ${esc(item.tax || '')}</div>
       </div>
       <div style="display:flex;align-items:center;gap:6px;">
-        <button onclick="cycleSplit(${i})" style="font-size:11px;font-weight:600;color:${splitColor};background:${splitColor}18;border:1.5px solid ${splitColor}44;border-radius:20px;padding:3px 8px;cursor:pointer;white-space:nowrap;font-family:'Noto Sans TC',sans-serif;">${esc(splitLabel)}</button>
+        ${splitSelectHTML(item.split, `setItemSplit(${i}, this.value)`)}
         <div id="pr-${i}"><div class="ritem-price">¥${fmt(item.price)}</div></div>
         <button class="edit-ic" onclick="editItem(${i})">✎</button>
         <button class="edit-ic" onclick="removeItem(${i})" style="color:var(--red);">✕</button>
       </div>
     </div>`;
   }).join('');
+}
+
+function setItemSplit(i, val) {
+  if (!curScan || !curScan.items[i]) return;
+  curScan.items[i].split = val;
+  renderItems(curScan.items);
 }
 
 function addItem() {
@@ -1030,12 +1044,14 @@ function removeItem(i) {
   document.getElementById('cfm-btn').textContent = `確認儲存（${curScan.items.length} 筆）`;
 }
 
-function cycleSplit(i) {
-  const order = ['aa', 'solo0', 'solo1', 'owe01', 'owe10'];
-  const cur = curScan.items[i].split || 'aa';
-  const next = order[(order.indexOf(cur) + 1) % order.length];
-  curScan.items[i].split = next;
-  renderItems(curScan.items);
+function setRecordSplit(ri, ii, val, e) {
+  if (e) e.stopPropagation();
+  const r = records[ri];
+  if (!r || !r.items || !r.items[ii]) return;
+  r.items[ii].split = val;
+  saveRecords();
+  showToast('已切換分帳');
+  refreshHome(); refreshRecords(); refreshStats();
 }
 
 function updateItemName(i, el) {
