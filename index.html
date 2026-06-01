@@ -634,7 +634,10 @@ function rcardHTML(r) {
     const lbl = splitLabel[item.split] || 'AA';
     const sl = item.split ? `<span style="font-size:10px;color:var(--blue);background:rgba(0,122,255,0.08);border-radius:10px;padding:1px 6px;margin-left:4px;">${esc(lbl)}</span>` : '';
     return `<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:0.5px solid var(--sep);">
-      <div style="font-size:14px;flex:1;">${esc(item.name || '')}${sl}</div>
+      <div style="font-size:14px;flex:1;display:flex;align-items:center;gap:4px;flex-wrap:wrap;">
+        <span id="rn-${recIdx}-${ii}" contenteditable="true" spellcheck="false" onblur="updateRecordItemName(${recIdx},${ii},this,event)" onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}" style="outline:none;border-bottom:1px dashed var(--tertiary);min-width:40px;display:inline-block;">${esc(item.name || '')}</span>
+        ${sl}
+      </div>
       <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;margin-left:8px;">
         <div id="rp-${recIdx}-${ii}" style="font-size:14px;font-weight:500;">¥${fmt(item.price)}</div>
         <button onclick="editRecordItem(${recIdx},${ii},event)" style="background:none;border:none;cursor:pointer;font-size:14px;color:var(--secondary);padding:2px;">✎</button>
@@ -663,6 +666,21 @@ function rcardHTML(r) {
 function toggleDetail(id) {
   const el = document.getElementById(id);
   if (el) el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+
+function updateRecordItemName(ri, ii, el, e) {
+  if (e) e.stopPropagation();
+  const r = records[ri];
+  if (!r || !r.items || !r.items[ii]) return;
+  const v = el.textContent.trim();
+  if (v && v !== r.items[ii].name) {
+    r.items[ii].name = v;
+    saveRecords();
+    showToast('已更新');
+    refreshStats();
+  } else if (!v) {
+    el.textContent = r.items[ii].name || '';
+  }
 }
 
 function editRecordItem(ri, ii, e) {
