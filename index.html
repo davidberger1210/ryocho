@@ -50,7 +50,8 @@
   /* TAB BAR */
   .tabbar { height:83px; background:rgba(242,242,247,0.95); backdrop-filter:blur(20px); border-top:0.5px solid var(--sep); display:flex; align-items:flex-start; justify-content:space-around; padding-top:8px; flex-shrink:0; }
   [data-theme="dark"] .tabbar { background:rgba(28,28,30,0.95); }
-  .tab { display:flex; flex-direction:column; align-items:center; gap:3px; border:none; background:none; cursor:pointer; color:var(--tertiary); min-width:60px; font-family:'Noto Sans TC',sans-serif; }
+  .tab { display:flex; flex-direction:column; align-items:center; gap:3px; border:none; background:none; cursor:pointer; color:var(--tertiary); min-width:60px; font-family:'Noto Sans TC',sans-serif; transition:transform 0.12s cubic-bezier(0.4,0,0.2,1); }
+  .tab:active { transform:scale(0.9); }
   .tab.on { color:var(--blue); }
   .tab svg { width:25px; height:25px; }
   .tab span { font-size:10px; font-weight:500; }
@@ -68,6 +69,12 @@
   .hero-stat-val { font-size:30px; font-weight:700; letter-spacing:-1px; line-height:1; }
   .hero-stat-sub { font-size:12px; opacity:0.7; margin-top:3px; }
   .hero-bg { position:absolute; bottom:-24px; right:-16px; font-size:130px; opacity:0.06; line-height:1; pointer-events:none; }
+  .hero-spark { margin-top:16px; display:flex; align-items:center; gap:10px; }
+  .hero-spark-lbl { font-size:10px; color:rgba(255,255,255,0.75); font-weight:600; letter-spacing:0.3px; flex-shrink:0; }
+  #hero-sparkline { flex:1; height:28px; display:block; }
+  #hero-sparkline polyline { stroke:rgba(255,255,255,0.9); stroke-width:1.5; fill:none; stroke-linecap:round; stroke-linejoin:round; }
+  #hero-sparkline .spark-fill { fill:rgba(255,255,255,0.12); stroke:none; }
+  #hero-sparkline circle { fill:white; }
 
   /* MONTH CHIPS */
   .month-chips { display:flex; gap:8px; padding:0 16px 12px; overflow-x:auto; -webkit-overflow-scrolling:touch; }
@@ -81,19 +88,24 @@
   .sec-link { font-size:15px; color:var(--blue); cursor:pointer; }
 
   /* RECORD CARD */
-  .rcard { background:var(--card); padding:14px 16px; display:flex; align-items:center; gap:12px; cursor:pointer; transition:opacity 0.1s; border-bottom:0.5px solid var(--sep); }
+  .rcard { background:var(--card); padding:14px 16px; display:flex; align-items:center; gap:12px; cursor:pointer; transition:transform 0.15s cubic-bezier(0.4,0,0.2,1), opacity 0.15s; border-bottom:0.5px solid var(--sep); }
   .rcard:first-child { border-radius:16px 16px 0 0; }
   .rcard:last-child { border-radius:0 0 16px 16px; border-bottom:none; }
   .rcard:only-child { border-radius:16px; border-bottom:none; }
-  .rcard:active { opacity:0.6; }
-  .rcard-icon { width:44px; height:44px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; }
+  .rcard:active { transform:scale(0.98); opacity:0.85; }
+  .rcard-icon { width:44px; height:44px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:22px; flex-shrink:0; }
   .rcard-info { flex:1; min-width:0; }
-  .rcard-name { font-size:16px; font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .rcard-meta { font-size:13px; color:var(--secondary); margin-top:2px; }
+  .rcard-name { font-size:17px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:var(--label); }
+  .rcard-meta { font-size:12px; color:var(--secondary); margin-top:3px; font-weight:500; }
   .rcard-amt { text-align:right; flex-shrink:0; }
-  .rcard-jpy { font-size:17px; font-weight:600; letter-spacing:-0.3px; }
-  .rcard-twd { font-size:12px; color:var(--secondary); }
-  .del-btn { background:rgba(255,59,48,0.08); border:1px solid rgba(255,59,48,0.3); color:var(--red); font-size:13px; font-weight:600; padding:6px 14px; border-radius:8px; cursor:pointer; font-family:'Noto Sans TC',sans-serif; }
+  .rcard-jpy { font-size:17px; font-weight:700; letter-spacing:-0.3px; }
+  .rcard-twd { font-size:11px; color:var(--secondary); margin-top:1px; }
+  .del-btn { background:rgba(255,59,48,0.08); border:1px solid rgba(255,59,48,0.3); color:var(--red); font-size:13px; font-weight:600; padding:6px 14px; border-radius:8px; cursor:pointer; font-family:'Noto Sans TC',sans-serif; transition:transform 0.12s cubic-bezier(0.4,0,0.2,1); }
+  .del-btn:active { transform:scale(0.96); }
+  .seg-btn { transition:all 0.2s cubic-bezier(0.4,0,0.2,1); }
+  .seg-btn:active { transform:scale(0.97); }
+  .set-row { transition:background-color 0.15s; }
+  .set-row:active { background-color:var(--fill); }
 
   .rcard-wrap { margin:0 16px; }
   .empty { text-align:center; padding:48px 24px; color:var(--secondary); }
@@ -109,7 +121,8 @@
   .seg { display:flex; background:var(--fill); border-radius:10px; padding:2px; margin:0 16px 12px; }
   .seg-btn { flex:1; padding:7px; border:none; border-radius:8px; font-size:14px; font-weight:500; cursor:pointer; background:transparent; color:var(--secondary); transition:all 0.2s; font-family:'Noto Sans TC',sans-serif; }
   .seg-btn.on { background:var(--card); color:var(--ink); box-shadow:0 1px 4px rgba(0,0,0,0.1); }
-  .date-hd { padding:20px 20px 6px; font-size:13px; font-weight:600; color:var(--secondary); display:flex; justify-content:space-between; }
+  .date-hd { padding:22px 20px 8px; font-size:14px; font-weight:700; color:var(--label); display:flex; justify-content:space-between; align-items:baseline; letter-spacing:0.2px; }
+  .date-hd > :last-child { font-size:13px; font-weight:600; color:var(--secondary); }
   .search-wrap { margin:0 16px 12px; }
   .search-inp { width:100%; padding:11px 14px; background:var(--card); border:none; border-radius:12px; font-size:15px; color:var(--ink); outline:none; font-family:'Noto Sans TC',sans-serif; }
 
@@ -152,7 +165,8 @@
   .opt-card { background:var(--card); border-radius:16px; padding:14px 16px; margin-bottom:10px; }
   .opt-lbl { font-size:13px; color:var(--secondary); font-weight:500; margin-bottom:10px; }
   .chips { display:flex; gap:8px; flex-wrap:wrap; }
-  .chip { padding:7px 14px; border-radius:20px; border:1.5px solid var(--sep); font-size:14px; font-weight:500; cursor:pointer; background:var(--card); font-family:'Noto Sans TC',sans-serif; transition:all 0.15s; color:var(--label); }
+  .chip { padding:7px 14px; border-radius:20px; border:1.5px solid var(--sep); font-size:14px; font-weight:500; cursor:pointer; background:var(--card); font-family:'Noto Sans TC',sans-serif; transition:all 0.15s cubic-bezier(0.4,0,0.2,1); color:var(--label); }
+  .chip:active { transform:scale(0.94); }
   .chip.on { border-color:var(--blue); background:rgba(0,122,255,0.08); color:var(--blue); }
   .chip.on-g { border-color:var(--green); background:rgba(52,199,89,0.08); color:var(--green); }
 
@@ -249,6 +263,10 @@
       <div class="hero-grid">
         <div><div class="hero-stat-lbl">今日支出</div><div class="hero-stat-val" id="h-today">¥0</div><div class="hero-stat-sub" id="h-today-t">NT$0</div></div>
         <div><div class="hero-stat-lbl">旅程累計</div><div class="hero-stat-val" id="h-total">¥0</div><div class="hero-stat-sub" id="h-total-t">NT$0</div></div>
+      </div>
+      <div class="hero-spark">
+        <span class="hero-spark-lbl">最近 7 天</span>
+        <svg id="hero-sparkline" viewBox="0 0 100 24" preserveAspectRatio="none"></svg>
       </div>
       <div class="hero-bg">¥</div>
     </div>
@@ -496,6 +514,24 @@ const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&
 const escAttr = s => esc(s);
 const fmt = n => (n || 0).toLocaleString();
 const twd = j => Math.round((j || 0) * settings.rate);
+
+const _animState = new WeakMap();
+function animateNumber(el, target, prefix = '¥') {
+  if (!el) return;
+  const from = _animState.get(el) ?? 0;
+  if (from === target) { el.textContent = prefix + fmt(target); return; }
+  _animState.set(el, target);
+  const start = performance.now();
+  const dur = 600;
+  function step(now) {
+    const t = Math.min((now - start) / dur, 1);
+    const eased = 1 - Math.pow(1 - t, 3);
+    const v = Math.round(from + (target - from) * eased);
+    el.textContent = prefix + fmt(v);
+    if (t < 1 && _animState.get(el) === target) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
 const today = () => new Date().toISOString().split('T')[0];
 
 function curMonth() {
@@ -602,10 +638,11 @@ function refreshHome() {
   document.getElementById('trip-name-d').textContent = m.tripName || settings.tripName;
   document.getElementById('month-name-d').textContent = m.name || '無月份分組';
   document.getElementById('day-badge-d').textContent = 'Day ' + dayN();
-  document.getElementById('h-today').textContent = '¥' + fmt(ta);
-  document.getElementById('h-today-t').textContent = 'NT$' + fmt(twd(ta));
-  document.getElementById('h-total').textContent = '¥' + fmt(all);
-  document.getElementById('h-total-t').textContent = 'NT$' + fmt(twd(all));
+  animateNumber(document.getElementById('h-today'), ta, '¥');
+  animateNumber(document.getElementById('h-today-t'), twd(ta), 'NT$');
+  animateNumber(document.getElementById('h-total'), all, '¥');
+  animateNumber(document.getElementById('h-total-t'), twd(all), 'NT$');
+  renderHeroSparkline(monthRecs);
 
   renderMonthChips();
 
@@ -615,6 +652,31 @@ function refreshHome() {
   } else {
     el.innerHTML = `<div class="rcard-wrap">${tr.slice().reverse().map(rcardHTML).join('')}</div>`;
   }
+}
+
+function renderHeroSparkline(recs) {
+  const el = document.getElementById('hero-sparkline');
+  if (!el) return;
+  const daily = {};
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(Date.now() - i * 86400000).toISOString().split('T')[0];
+    daily[d] = 0;
+  }
+  (recs || []).forEach(r => { if (daily[r.date] !== undefined) daily[r.date] += r.total; });
+  const values = Object.values(daily);
+  const max = Math.max(...values, 1);
+  const w = 100, h = 24;
+  const n = values.length;
+  const step = w / Math.max(n - 1, 1);
+  const points = values.map((v, i) => `${(i * step).toFixed(1)},${(h - (v / max) * (h - 4) - 2).toFixed(1)}`);
+  const polyPoints = points.join(' ');
+  const fillPath = `M0,${h} L${points.join(' L')} L${w},${h} Z`;
+  const lastPoint = points[n - 1].split(',');
+  el.innerHTML = `
+    <path class="spark-fill" d="${fillPath}"/>
+    <polyline points="${polyPoints}"/>
+    <circle cx="${lastPoint[0]}" cy="${lastPoint[1]}" r="2"/>
+  `;
 }
 
 function renderMonthChips() {
@@ -647,7 +709,7 @@ function rcardHTML(r) {
     ? `<button onclick="deleteRecord(${r.id},event)" style="background:rgba(255,59,48,0.12);border:none;color:var(--red);font-size:13px;font-weight:700;border-radius:50%;width:28px;height:28px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;line-height:1;padding:0;">✕</button>` : '';
   return `<div class="rcard fi" style="flex-direction:column;align-items:stretch;">
     <div style="display:flex;align-items:center;gap:12px;cursor:pointer;" onclick="toggleDetail('${rid}')">
-      <div class="rcard-icon" style="background:${CC[r.category] || '#8E8E93'}22;">${CI[r.category] || '📦'}</div>
+      <div class="rcard-icon" style="background:${CC[r.category] || '#8E8E93'}28;color:${CC[r.category] || '#8E8E93'};">${CI[r.category] || '📦'}</div>
       <div class="rcard-info"><div class="rcard-name">${esc(r.storeName)}</div><div class="rcard-meta">${esc(r.category)} · ${esc(r.payMethod)}${payer}</div></div>
       <div class="rcard-amt"><div class="rcard-jpy">¥${fmt(r.total)}</div><div class="rcard-twd">NT$${fmt(twd(r.total))}</div></div>
       ${delQuick}
